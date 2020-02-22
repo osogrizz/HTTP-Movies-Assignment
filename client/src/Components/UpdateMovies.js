@@ -2,49 +2,63 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
 const UpdateMovies = (props) => {
-  console.log(props)
+  console.log('update', props)
 
-  const [updatedMovie, setUpdatedMovie] = useState({
-    id: '',
+  // const id = props.movie.id
+
+  const [newMovie, setNewMovie] = useState({
+    id: Number(props.match.params.id),
     title: '',
     director: '',
-    metascore: '',
+    metascore: null,
     stars: []
   })
 
   useEffect(() => {
-    axios
-    .get(`http://localhost:5000/api/movies`)
-    .then(res => {
-      console.log(res)
-    })
-    .catch(err => {
-      console.log(err)
-    })
-  },[updatedMovie])
+    const editMovie = props.movies.find( movie => {
+      return `${movie.id}` === props.match.params.id
+    }
+    )
+    
+    if (editMovie) {
+      setNewMovie(editMovie)
+    }
+    
+  },[props.newMovie, props.match.params.id])
 
   const handleChange = (e) => {
     e.persist()
-    setUpdatedMovie({
-      ...updatedMovie,
+    if (e.target.name === 'stars') {
+      setNewMovie({
+        ...newMovie,
+        [e.target.name]: e.target.value
+      })
+    }
+    setNewMovie({
+      ...newMovie,
       [e.target.name]: e.target.value
     })
+    
   }
 
+  
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log(e)
     axios
-      .put(`http://localhost:5000/api/movies/${updatedMovie.id}`, updatedMovie)
+      .put(`http://localhost:5000/api/movies/${newMovie.id}`, newMovie)
+
       .then(res => {
-        console.log(res)
+        console.log(res.data)
+        props.updatedMovies(res.data)
+        props.history.push('/')
       })
       .catch(err => {
         console.log(err)
       })
   }
-
-
+  
+  
+  console.log(newMovie.id, newMovie)
 
   return (
     <div>
@@ -54,35 +68,39 @@ const UpdateMovies = (props) => {
           type="text" 
           name="title" 
           placeholder="title" 
-          // value={props.title} 
+          value={newMovie.title} 
           onChange={handleChange}
+          required
           />
 
         <input 
           type="text" 
           name="director"  
           placeholder="director" 
-          // value={props.director} 
+          value={newMovie.director} 
           onChange={handleChange}
+          required
+          />
+
+        <input 
+          type="number" 
+          name="metascore"  
+          placeholder="metascore" 
+          value={Number(newMovie.metascore)} 
+          onChange={handleChange}
+          required
           />
 
         <input 
           type="text" 
-          name="metascore"  
-          placeholder="metascore" 
-          // value={props.director} 
-          onChange={handleChange}
-          />
-
-        <input 
-          type="email" 
           name="stars" 
           placeholder="stars" 
-          // value={props.stars} 
+          value={newMovie.stars} 
           onChange={handleChange}
+          required
         />
 
-        <button onClick={handleSubmit}>Update Movie</button>
+        <button>Update Movie</button>
       </form>
     </div>
   )
