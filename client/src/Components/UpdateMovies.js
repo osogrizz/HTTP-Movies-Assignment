@@ -28,17 +28,19 @@ const UpdateMovies = (props) => {
 
   const handleChange = (e) => {
     e.persist()
-    if (e.target.name === 'stars') {
-      setNewMovie({
-        ...newMovie,
-        [e.target.name]: e.target.value
-      })
-    }
     setNewMovie({
       ...newMovie,
       [e.target.name]: e.target.value
     })
-    
+  }
+  
+  // handleStars logic did not work as part of general handleChange function ???
+  const handleStars = (e) => {
+    e.persist()
+    setNewMovie({
+      ...newMovie,
+      [e.target.name]: e.target.value.split(',') 
+    })
   }
 
   
@@ -96,7 +98,7 @@ const UpdateMovies = (props) => {
           name="stars" 
           placeholder="stars" 
           value={newMovie.stars} 
-          onChange={handleChange}
+          onChange={handleStars}
           required
         />
 
